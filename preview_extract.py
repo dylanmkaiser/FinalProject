@@ -15,6 +15,8 @@ year='2018'
 month='04'
 day='10'
 
+preview_id=f'{home_abv}{year}{month}{day}'
+
 url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}0.shtml'
 
 def preview_extract(url):
@@ -142,7 +144,7 @@ def preview_extract(url):
     home_matchup_wins=len(season_matchups.loc[head2head['Winner']==home_abv])
     home_matchup_record=home_matchup_wins/matchup_count
 
-    preview_data=[game_no,
+    preview_data=[preview_id,game_no,
     away_pitcher_rh,away_pitcher_record,away_pitcher_era,away_pitcher_ip,
     home_pitcher_rh,home_pitcher_record,home_pitcher_era,home_pitcher_ip,
     away_record,away_last_ten,away_venue_record,away_pitcher_type_record,
@@ -150,7 +152,7 @@ def preview_extract(url):
     away_ops_vs_pitcher_type,home_ops_vs_pitcher_type,
     matchup_count,home_matchup_record]
 
-    preview_headers=['game_no',
+    preview_headers=['id','game_no',
     'away_pitcher_rh','away_pitcher_record','away_pitcher_era','away_pitcher_ip',
     'home_pitcher_rh','home_pitcher_record','home_pitcher_era','home_pitcher_ip',
     'away_record','away_last_ten','away_venue_record','away_pitcher_type_record',
@@ -159,7 +161,7 @@ def preview_extract(url):
     'matchup_count','home_matchup_record']
 
     preview=dict(zip(preview_headers,preview_data))
-    print (f'{home_abv}{year}{month}{day} extract complete')
-    return preview
+    print (f'{preview_id} extract complete')
+    return preview_headers
 
-preview_extract(url)
+print(preview_extract(url))
