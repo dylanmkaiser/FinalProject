@@ -10,16 +10,14 @@ def record_split(record_string):
     else:
         return round(int(cleaned[0])/(int(cleaned[1])+int(cleaned[0])),2)
 
-home_abv='BAL'
-year='2018'
-month='04'
-day='10'
 
-preview_id=f'{home_abv}{year}{month}{day}'
+def preview_extractor(url,home_abv,year,month,day):
 
-url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}0.shtml'
 
-def preview_extract(url):
+    preview_id=f'{home_abv}{year}{month}{day}'
+
+ 
+
 
     #Scrape Pandas Tables
     tables=pd.read_html(url)
@@ -49,10 +47,10 @@ def preview_extract(url):
     away_pitcher_record=record_split(away_pitcher[6])
 
     #Away Pitcher ERA
-    away_pitcher_era=float(away_pitcher[7].strip(')</h2>'))
+    away_pitcher_era=away_pitcher[7].strip(')</h2>')
 
     #Away Pitcher Innings Pitched, may contain prior year data if before May
-    away_pitcher_ip=tables[8]['IP'][0]
+    away_pitcher_ip=str(tables[8]['IP'][0])
 
     #Ugly Home Pitcher Data
     home_pitcher=str(soup.find_all('h2')[5]).split()
@@ -70,10 +68,10 @@ def preview_extract(url):
     home_pitcher_record=record_split(home_pitcher[6])
 
     #Home Pitcher ERA
-    home_pitcher_era=float(home_pitcher[7].strip(')</h2>'))
+    home_pitcher_era=home_pitcher[7].strip(')</h2>')
 
     #Home Pitcher Innings Pitched, may contain prior year data if before May
-    home_pitcher_ip=tables[5]['IP'][0]
+    home_pitcher_ip=int(tables[5]['IP'][0])
 
     [home_pitcher_rh,home_pitcher_record,home_pitcher_era,home_pitcher_ip]
 
@@ -137,31 +135,43 @@ def preview_extract(url):
     head2head=tables[2]
 
     #Number of Matchups this Season
-    matchup_count=head2head.loc[head2head['Winner'] == 'Away'].index[0]
+    try:
+        matchup_count=head2head.loc[head2head['Winner'] == 'Away'].index[0]
 
-    #Home Team Win % vs this Away Team
-    season_matchups=head2head.head(matchup_count)
-    home_matchup_wins=len(season_matchups.loc[head2head['Winner']==home_abv])
-    home_matchup_record=home_matchup_wins/matchup_count
+        #Home Team Win % vs this Away Team
+        season_matchups=head2head.head(matchup_count)
+        home_matchup_wins=len(season_matchups.loc[head2head['Winner']==home_abv])
+        home_matchup_record=home_matchup_wins/matchup_count
+    except:
+        matchup_count=0
+        home_matchup_record=.5
 
-    preview_data=[preview_id,game_no,
+    preview_data=(preview_id,game_no,
     away_pitcher_rh,away_pitcher_record,away_pitcher_era,away_pitcher_ip,
     home_pitcher_rh,home_pitcher_record,home_pitcher_era,home_pitcher_ip,
     away_record,away_last_ten,away_venue_record,away_pitcher_type_record,
     home_record,home_last_ten,home_venue_record,home_pitcher_type_record,
     away_ops_vs_pitcher_type,home_ops_vs_pitcher_type,
-    matchup_count,home_matchup_record]
+    matchup_count,home_matchup_record)
 
-    preview_headers=['id','game_no',
+    preview_headers=('id','game_no',
     'away_pitcher_rh','away_pitcher_record','away_pitcher_era','away_pitcher_ip',
     'home_pitcher_rh','home_pitcher_record','home_pitcher_era','home_pitcher_ip',
     'away_record','away_last_ten','away_venue_record','away_pitcher_type_record',
     'home_record','home_last_ten','home_venue_record','home_pitcher_type_record',
     'away_ops_vs_pitcher_type','home_ops_vs_pitcher_type',
-    'matchup_count','home_matchup_record']
+    'matchup_count','home_matchup_record')
 
-    preview=dict(zip(preview_headers,preview_data))
     print (f'{preview_id} extract complete')
-    return preview_headers
+    return preview_data
 
-print(preview_extract(url))
+home_abv='BAL'
+year='2018'
+month='05'
+day='08'
+
+
+
+
+url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}0.shtml'
+preview_extractor(url,home_abv,year,month,day)
