@@ -6,7 +6,7 @@ import requests
 def record_split(record_string):
     cleaned=record_string.strip(',').split('-')
     if int(cleaned[0])+int(cleaned[1])==0:
-        return .5
+        return 0
     else:
         return round(int(cleaned[0])/(int(cleaned[1])+int(cleaned[0])),2)
 
@@ -38,19 +38,27 @@ def preview_extractor(url,home_abv,year,month,day):
     away_pitcher_hand=away_pitcher[5]
     if away_pitcher_hand=='RHP,':
         away_pitcher_rh=1
-    elif away_pitcher_hand=='LHP,':
+    else: 
         away_pitcher_rh=0
-    else:
-        away_pitcher_rh=2
+
 
     #Away Pitcher Record
-    away_pitcher_record=record_split(away_pitcher[6])
+    try:
+        away_pitcher_record=record_split(away_pitcher[6])
+    except: 
+        away_pitcher_record=0
 
     #Away Pitcher ERA
-    away_pitcher_era=away_pitcher[7].strip(')</h2>')
+    try:
+        away_pitcher_era=away_pitcher[7].strip(')</h2>')
+    except:
+        away_pitcher_era=0
 
     #Away Pitcher Innings Pitched, may contain prior year data if before May
-    away_pitcher_ip=str(tables[8]['IP'][0])
+    try:
+        away_pitcher_ip=str(tables[8]['IP'][0])
+    except:
+        away_pitcher_ip=0
 
     #Ugly Home Pitcher Data
     home_pitcher=str(soup.find_all('h2')[5]).split()
@@ -65,15 +73,23 @@ def preview_extractor(url,home_abv,year,month,day):
         home_pitcher_rh=2
 
     #Home Pitcher Record
-    home_pitcher_record=record_split(home_pitcher[6])
+    try:
+        home_pitcher_record=record_split(home_pitcher[6])
+    except:
+        home_pitcher_record=0
 
     #Home Pitcher ERA
-    home_pitcher_era=home_pitcher[7].strip(')</h2>')
+    try:
+        home_pitcher_era=home_pitcher[7].strip(')</h2>')
+    except:
+        home_pitcher_era=0
 
     #Home Pitcher Innings Pitched, may contain prior year data if before May
-    home_pitcher_ip=int(tables[5]['IP'][0])
+    try:
+        home_pitcher_ip=int(tables[5]['IP'][0])
+    except:
+        home_pitcher_ip=0
 
-    [home_pitcher_rh,home_pitcher_record,home_pitcher_era,home_pitcher_ip]
 
     #Away Team Main Table
     team=tables[0]
@@ -161,17 +177,15 @@ def preview_extractor(url,home_abv,year,month,day):
     'home_record','home_last_ten','home_venue_record','home_pitcher_type_record',
     'away_ops_vs_pitcher_type','home_ops_vs_pitcher_type',
     'matchup_count','home_matchup_record')
-
-    print (f'{preview_id} extract complete')
     return preview_data
 
 home_abv='BAL'
 year='2018'
 month='05'
-day='08'
+day='12'
+gno='2'
 
 
 
-
-url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}0.shtml'
-preview_extractor(url,home_abv,year,month,day)
+# url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}{gno}.shtml'
+# preview_extractor(url,home_abv,year,month,day,gno)
