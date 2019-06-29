@@ -11,10 +11,10 @@ def record_split(record_string):
         return round(int(cleaned[0])/(int(cleaned[1])+int(cleaned[0])),2)
 
 
-def preview_extractor(url,home_abv,year,month,day):
+def preview_extractor(url,home_abv,year,month,day,gno):
 
 
-    preview_id=f'{home_abv}{year}{month}{day}'
+    preview_id=f'{home_abv}{year}{month}{day}{gno}'
 
  
 
@@ -44,19 +44,19 @@ def preview_extractor(url,home_abv,year,month,day):
 
     #Away Pitcher Record
     try:
-        away_pitcher_record=record_split(away_pitcher[6])
+        away_pitcher_record=float(record_split(away_pitcher[6]))
     except: 
         away_pitcher_record=0
 
     #Away Pitcher ERA
     try:
-        away_pitcher_era=away_pitcher[7].strip(')</h2>')
+        away_pitcher_era=float(away_pitcher[7].strip(')</h2>'))
     except:
         away_pitcher_era=0
 
     #Away Pitcher Innings Pitched, may contain prior year data if before May
     try:
-        away_pitcher_ip=str(tables[8]['IP'][0])
+        away_pitcher_ip=float(tables[8]['IP'][0])
     except:
         away_pitcher_ip=0
 
@@ -74,19 +74,19 @@ def preview_extractor(url,home_abv,year,month,day):
 
     #Home Pitcher Record
     try:
-        home_pitcher_record=record_split(home_pitcher[6])
+        home_pitcher_record=float(record_split(home_pitcher[6]))
     except:
         home_pitcher_record=0
 
     #Home Pitcher ERA
     try:
-        home_pitcher_era=home_pitcher[7].strip(')</h2>')
+        home_pitcher_era=float(home_pitcher[7].strip(')</h2>'))
     except:
         home_pitcher_era=0
 
     #Home Pitcher Innings Pitched, may contain prior year data if before May
     try:
-        home_pitcher_ip=int(tables[5]['IP'][0])
+        home_pitcher_ip=float(tables[5]['IP'][0])
     except:
         home_pitcher_ip=0
 
@@ -177,13 +177,16 @@ def preview_extractor(url,home_abv,year,month,day):
     'home_record','home_last_ten','home_venue_record','home_pitcher_type_record',
     'away_ops_vs_pitcher_type','home_ops_vs_pitcher_type',
     'matchup_count','home_matchup_record')
-    return preview_data
+    return(preview_data)
 
-home_abv='BAL'
-year='2018'
-month='05'
-day='12'
-gno='2'
+
+
+
+# home_abv='BAL'
+# year='2018'
+# month='05'
+# day='12'
+# gno='1'
 
 
 

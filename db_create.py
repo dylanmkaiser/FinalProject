@@ -8,6 +8,7 @@ import requests
 print('------------------------')
 print('2.  Create Database')
 from preview_extract import preview_extractor
+from results import results_extractor
 
 db=os.getenv("DATABASE_NAME")
 
@@ -88,56 +89,66 @@ mycursor.execute \
 mycursor.execute \
 ("create table mlb_model.result \
   (result_id int(10) not null\
-  ,home_name varchar(255)\
-  ,home_score int(2) \
+  ,date varchar(255)\
+  ,gamenum int(5)\
   ,away_name varchar(255) \
   ,away_score int(2)\
+  ,home_name varchar(255)\
+  ,home_score int(2) \
   ,home_win boolean\
-  ,date varchar(255)\
   ,primary key (result_id))")
 
-
-days=['12']
-# ,'02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
-months=['05']
-# ,'06','07','08','09','10',]
-
-def extract_n_store (home_abv,year,month,day):
-  try:
-    url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}0.shtml'
-    stat_list=list(preview_extractor(url,home_abv,year,month,day))
-    string_list=[]
-    for i in stat_list:
-      string_list.append(str(i))
-    preview2Insert = "INSERT INTO preview2 (preview_id,game_no,away_pitcher_rh,away_pitcher_record,away_pitcher_era,away_pitcher_ip,home_pitcher_rh,home_pitcher_record,home_pitcher_era,home_pitcher_ip,away_record,away_last_ten,away_venue_record,away_pitcher_type_record,home_record,home_last_ten,home_venue_record,home_pitcher_type_record,away_ops_vs_pitcher_type,home_ops_vs_pitcher_type,matchup_count,home_matchup_record) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"  
-    mycursor.execute(preview2Insert, string_list) 
-    mydb.commit()
-  except:
-    url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}2.shtml'
-    stat_list=list(preview_extractor(url,home_abv,year,month,day))
-    string_list=[]
-    for i in stat_list:
-      string_list.append(str(i))
-    preview2Insert = "INSERT INTO preview2 (preview_id,game_no,away_pitcher_rh,away_pitcher_record,away_pitcher_era,away_pitcher_ip,home_pitcher_rh,home_pitcher_record,home_pitcher_era,home_pitcher_ip,away_record,away_last_ten,away_venue_record,away_pitcher_type_record,home_record,home_last_ten,home_venue_record,home_pitcher_type_record,away_ops_vs_pitcher_type,home_ops_vs_pitcher_type,matchup_count,home_matchup_record) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"  
-    mycursor.execute(preview2Insert, string_list) 
-    mydb.commit()
+teams=['ATL','ARI','BAL','BOS','CHN','CHA','CIN','CLE','COL','DET','HOU','KCA','ANA','LAN','MIA','MIL','MIN','NYN','NYA','OAK','PHI','PIT','SDN','SFN','SEA','SLN','TBA','TEX','TOR','WAS']
+days=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']
+months=['04','05','06','07','08','09','10']
+years=['2017','2018','2019']
 
 
-for m in months:
-  for d in days:
-    try:
-      home_abv='BAL'
-      year='2018'
-      month=m
-      day=d
+def extract_n_store (home_abv,year,month,day,gno):
+  url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}{gno}.shtml'
+  stat_list=list(preview_extractor(url,home_abv,year,month,day,gno))
+  string_list=[]
+  for i in stat_list:
+    string_list.append(str(i))
+  preview2Insert = "INSERT INTO preview2 (preview_id,game_no,away_pitcher_rh,away_pitcher_record,away_pitcher_era,away_pitcher_ip,home_pitcher_rh,home_pitcher_record,home_pitcher_era,home_pitcher_ip,away_record,away_last_ten,away_venue_record,away_pitcher_type_record,home_record,home_last_ten,home_venue_record,home_pitcher_type_record,away_ops_vs_pitcher_type,home_ops_vs_pitcher_type,matchup_count,home_matchup_record) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"  
+  mycursor.execute(preview2Insert, string_list) 
+  mydb.commit()
 
-      extract_n_store(home_abv,year,month,day)
+for t in teams:
+  for y in years:
+    for m in months:
+      for d in days:
 
-      preview_id=f'{home_abv}{year}{month}{day}'
-      print (f'{preview_id} extract complete')
+          home_abv=t
+          year=y
+          month=m
+          day=d
+          try:
+            gno=0
+            extract_n_store(home_abv,year,month,day,gno)
+            preview_id=f'{home_abv}{year}{month}{day}{gno}'
+            print (f'{preview_id} extract complete')
 
-    except:
-      print(f'date({day}) not found')
-      
+          except:
+            try:
+              for i in [1,2]:
+                gno=i
+                extract_n_store(home_abv,year,month,day,gno)
+                preview_id=f'{home_abv}{year}{month}{day}{gno}'
+                print (f'{preview_id} extract complete')  
+            except:
+              print(f'date({day}) not found')
+        
+
+results_table=results_extractor()
+string_list2=[]
+for i in stat_list:
+  string_list2.append(str(i))
+resultInsert = "INSERT INTO result (result_id,date,gamenum,away_name,away_score,home_name,home_score,home_win) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"  
+mycursor.execute(resultInsert, string_list2) 
+mydb.commit()
+
+
+
 print('------------------------')
 print('--- Job Completed ---')
