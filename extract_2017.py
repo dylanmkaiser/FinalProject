@@ -11,7 +11,7 @@ def record_split(record_string):
         return round(int(cleaned[0])/(int(cleaned[1])+int(cleaned[0])),2)
 
 
-def preview_extractor(url,home_abv,year,month,day,gno):
+def extractor_2017(url,home_abv,year,month,day,gno):
 
 
     preview_id=f'{home_abv}{year}{month}{day}{gno}'
@@ -95,7 +95,7 @@ def preview_extractor(url,home_abv,year,month,day,gno):
     team=tables[0]
 
     #Away Team Overall Win/Loss Record
-    away_record=record_split(team[1][1])
+    away_record=record_split(team[1][2])
 
 
     #Away Team Win/Loss Record in Last 10 Games
@@ -114,7 +114,7 @@ def preview_extractor(url,home_abv,year,month,day,gno):
     team=tables[1]
 
     #Home Team Overall Win/Loss Record
-    home_record=record_split(team[1][1])
+    home_record=record_split(team[1][2])
 
 
     #Home Team Win/Loss Record in Last 10 Games

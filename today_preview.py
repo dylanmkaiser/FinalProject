@@ -14,13 +14,17 @@ def record_split(record_string):
 def preview_extractor(url,home_abv,year,month,day,gno):
 
 
-    preview_id=f'{home_abv}{year}{month}{day}{gno}'
 
  
 
 
     #Scrape Pandas Tables
     tables=pd.read_html(url)
+
+    #Names
+    home_name=tables[1][1][0].split('2019 ')[1]
+    away_name=tables[0][1][0].split('2019 ')[1]
+
 
     #Number of Games Played This Season/Test if We Should Record Data
     game_no=int(tables[0][1][3])
@@ -108,7 +112,7 @@ def preview_extractor(url,home_abv,year,month,day,gno):
     if home_pitcher_rh==1:
         away_pitcher_type_record=record_split(team[1][16])
     else:
-        away_pitcher_type_record=record_split(team[1][17])
+        record_split(team[1][17])
 
     #Home Team Main Table
     team=tables[1]
@@ -162,7 +166,7 @@ def preview_extractor(url,home_abv,year,month,day,gno):
         matchup_count=0
         home_matchup_record=.5
 
-    preview_data=(preview_id,game_no,
+    preview_data=(home_name,away_name,game_no,
     away_pitcher_rh,away_pitcher_record,away_pitcher_era,away_pitcher_ip,
     home_pitcher_rh,home_pitcher_record,home_pitcher_era,home_pitcher_ip,
     away_record,away_last_ten,away_venue_record,away_pitcher_type_record,
@@ -176,14 +180,20 @@ def preview_extractor(url,home_abv,year,month,day,gno):
 
 
 
-
-# home_abv='NYA'
-# day='14'
-# month='04'
-# year='2017'
-# gno='0'
-
-# url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}{gno}.shtml'
-# preview_extractor(url,home_abv,year,month,day,gno)
+teams=['ATL','ARI','BAL','BOS','CHN','CHA','CIN','CLE','COL','DET','HOU','KCA','ANA','LAN','MIA','MIL','MIN','NYN','NYA','OAK','PHI','PIT','SDN','SFN','SEA','SLN','TBA','TEX','TOR','WAS']
+days=['29']
+months=['06']
+years=['2019']
 
 
+for t in teams:
+    try:
+        home_abv=t
+        year='2019'
+        month='06'
+        day='29'
+        gno='0'
+        url=f'https://www.baseball-reference.com/previews/{year}/{home_abv}{year}{month}{day}{gno}.shtml'
+        print(preview_extractor(url,home_abv,year,month,day,gno))
+    except:
+        print('No')
